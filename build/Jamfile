@@ -7,7 +7,7 @@ import path ;
 import os ;
 import option ;
 import boostcpp ;
-import ../../tools/cmake-config ;
+import ../../tools/boost-install ;
 
 # install-requirements
 
@@ -64,7 +64,7 @@ local lib-locate = [ option.get libdir : $(prefix)/lib ] ;
 
 alias boost_headers ;
 
-cmake-config.libs install-cmake-config : $(lib-locate) : $(BOOST_VERSION) : boost_headers ;
+boost-install.install-cmake-config $(lib-locate) : $(BOOST_VERSION) : boost_headers ;
 explicit install-cmake-config ;
 
 # install
