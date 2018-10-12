@@ -7,6 +7,8 @@ import path ;
 import os ;
 import option ;
 import boostcpp ;
+import sequence ;
+import set ;
 import ../../tools/boost-install ;
 
 # install-requirements
@@ -36,16 +38,26 @@ install-requirements += <install-default-prefix>$(install-default-prefix) ;
 
 # install-headers
 
-local all-headers = $(BOOST_MODULARLAYOUT) ;
+# first, the 'modular' headers
 
-for local lib in $(all-headers)
+local modular-headers = $(BOOST_MODULARLAYOUT) ;
+
+local skip-headers ;
+
+for local lib in $(modular-headers)
 {
-    local header-root = $(BOOST_ROOT)/libs/$(lib)/include ;
-    local headers = [ path.glob-tree $(header-root) : *.hpp *.ipp *.h *.inc *.SUNWCCh ] ;
+    local header-root = $(BOOST_ROOT)/libs/$(lib)/include/boost ;
+
+    local headers =
+        [ path.glob-tree $(header-root) : *.hpp *.ipp *.h *.inc ]
+        [ path.glob-tree $(header-root)/compatibility/cpp_c_headers : c* ] ;
+
+    skip-headers += [ sequence.transform path.relative-to [ path.make $(header-root) ] : $(headers) ] ;
 
     package.install install-$(lib)-headers boost
         : $(install-requirements)
           <install-source-root>$(header-root)
+          <install-no-version-symlinks>on
         : # No binaries
         : # No libraries
         : $(headers)
@@ -54,7 +66,30 @@ for local lib in $(all-headers)
     explicit install-$(lib)-headers ;
 }
 
-alias install-headers : install-$(all-headers)-headers ;
+# then, the non-modular headers in boost/, minus the modular ones
+
+local header-root = [ path.make $(BOOST_ROOT)/boost ] ;
+
+local headers =
+    [ path.glob-tree $(BOOST_ROOT)/boost : *.hpp *.ipp *.h *.inc ]
+    [ path.glob-tree $(BOOST_ROOT)/boost/compatibility/cpp_c_headers : c* ] ;
+
+headers = [ set.difference $(headers) : $(header-root)/$(skip-headers) ] ;
+
+package.install install-boost-headers boost
+    : $(install-requirements)
+      <install-source-root>$(header-root)
+      <install-no-version-symlinks>on
+    : # No binaries
+    : # No libraries
+    : $(headers)
+;
+
+explicit install-boost-headers ;
+
+#
+
+alias install-headers : install-$(modular-headers)-headers install-boost-headers ;
 explicit install-headers ;
 
 # install-cmake-config
