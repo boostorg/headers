@@ -18,10 +18,18 @@ local install-requirements ;
 local layout = [ modules.peek boostcpp : layout ] ;
 local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
 
+local install-header-subdir ;
+
 if $(layout) = versioned
 {
-    install-requirements += <install-header-subdir>boost-$(BOOST_VERSION_TAG) ;
+    install-header-subdir = boost-$(BOOST_VERSION_TAG)/boost ;
 }
+else
+{
+    install-header-subdir = boost ;
+}
+
+install-requirements += <install-header-subdir>$(install-header-subdir) ;
 
 local install-default-prefix ;
 
