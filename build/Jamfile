@@ -64,7 +64,7 @@ for local lib in $(modular-headers)
 
     skip-headers += [ sequence.transform path.relative-to [ path.make $(header-root) ] : $(headers) ] ;
 
-    package.install install-$(lib)-headers boost
+    package.install install-$(lib)-headers Boost
         : $(install-requirements)
           <install-source-root>$(header-root)
           <install-no-version-symlinks>on
@@ -86,7 +86,7 @@ local headers =
 
 headers = [ set.difference $(headers) : $(header-root)/$(skip-headers) ] ;
 
-package.install install-boost-headers boost
+package.install install-boost-headers Boost
     : $(install-requirements)
       <install-source-root>$(header-root)
       <install-no-version-symlinks>on
@@ -104,17 +104,9 @@ explicit install-headers ;
 
 # install-cmake-config
 
-local prefix = [ option.get prefix : $(install-default-prefix) ] ;
-#local exec-prefix = [ option.get exec-prefix : $(prefix) ] ;
-local includedir = [ option.get includedir : $(prefix)/include ] ;
-local libdir = [ option.get libdir : $(prefix)/lib ] ; # $(exec-prefix) ignored in package.jam too
-local cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
-
-includedir = $(includedir)$(header-subdir) ;
-
 alias boost_headers ;
 
-boost-install.install-cmake-config $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : boost_headers ;
+boost-install.install-cmake-config $(BOOST_VERSION) : boost_headers ;
 explicit install-cmake-config ;
 
 # install
