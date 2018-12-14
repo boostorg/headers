@@ -14,6 +14,7 @@ import ../../tools/boost-install ;
 # install-requirements
 
 local install-requirements ;
+local header-subdir = "" ;
 
 local layout = [ modules.peek boostcpp : layout ] ;
 local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
@@ -23,6 +24,7 @@ local install-header-subdir ;
 if $(layout) = versioned
 {
     install-header-subdir = boost-$(BOOST_VERSION_TAG)/boost ;
+    header-subdir = /boost-$(BOOST_VERSION_TAG) ;
 }
 else
 {
@@ -103,11 +105,16 @@ explicit install-headers ;
 # install-cmake-config
 
 local prefix = [ option.get prefix : $(install-default-prefix) ] ;
-local lib-locate = [ option.get libdir : $(prefix)/lib ] ;
+#local exec-prefix = [ option.get exec-prefix : $(prefix) ] ;
+local includedir = [ option.get includedir : $(prefix)/include ] ;
+local libdir = [ option.get libdir : $(prefix)/lib ] ; # $(exec-prefix) ignored in package.jam too
+local cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
+
+includedir = $(includedir)$(header-subdir) ;
 
 alias boost_headers ;
 
-boost-install.install-cmake-config $(lib-locate) : $(BOOST_VERSION) : boost_headers ;
+boost-install.install-cmake-config $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : boost_headers ;
 explicit install-cmake-config ;
 
 # install
