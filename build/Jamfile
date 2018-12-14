@@ -4,47 +4,25 @@
 
 import package ;
 import path ;
-import os ;
-import option ;
-import boostcpp ;
 import sequence ;
 import set ;
 import ../../tools/boost-install ;
+import ../../tools/boost-install-dirs ;
 
-# install-requirements
+# install-header-subdir
 
-local install-requirements ;
-local header-subdir = "" ;
-
-local layout = [ modules.peek boostcpp : layout ] ;
-local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
+local header-subdir = [ boost-install-dirs.header-subdir ] ;
 
 local install-header-subdir ;
 
-if $(layout) = versioned
+if $(header-subdir)
 {
-    install-header-subdir = boost-$(BOOST_VERSION_TAG)/boost ;
-    header-subdir = /boost-$(BOOST_VERSION_TAG) ;
+    install-header-subdir = $(header-subdir)/boost ;
 }
 else
 {
     install-header-subdir = boost ;
 }
-
-install-requirements += <install-header-subdir>$(install-header-subdir) ;
-
-local install-default-prefix ;
-
-if [ os.name ] = NT
-{
-    install-default-prefix = C:/Boost ;
-}
-else
-{
-    install-default-prefix = /usr/local ;
-}
-
-install-requirements += <install-default-prefix>$(install-default-prefix) ;
 
 # install-headers
 
@@ -65,7 +43,7 @@ for local lib in $(modular-headers)
     skip-headers += [ sequence.transform path.relative-to [ path.make $(header-root) ] : $(headers) ] ;
 
     package.install install-$(lib)-headers Boost
-        : $(install-requirements)
+        : <install-header-subdir>$(install-header-subdir)
           <install-source-root>$(header-root)
           <install-no-version-symlinks>on
         : # No binaries
@@ -87,7 +65,7 @@ local headers =
 headers = [ set.difference $(headers) : $(header-root)/$(skip-headers) ] ;
 
 package.install install-boost-headers Boost
-    : $(install-requirements)
+    : <install-header-subdir>$(install-header-subdir)
       <install-source-root>$(header-root)
       <install-no-version-symlinks>on
     : # No binaries
@@ -106,7 +84,7 @@ explicit install-headers ;
 
 alias boost_headers ;
 
-boost-install.install-cmake-config $(BOOST_VERSION) : boost_headers ;
+boost-install.install-cmake-config boost_headers ;
 explicit install-cmake-config ;
 
 # install
