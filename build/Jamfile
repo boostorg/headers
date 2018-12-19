@@ -6,8 +6,8 @@ import package ;
 import path ;
 import sequence ;
 import set ;
-import ../../tools/boost-install ;
-import ../../tools/boost-install-dirs ;
+import ../../../tools/boost_install/boost-install ;
+import ../../../tools/boost_install/boost-install-dirs ;
 
 # install-header-subdir
 
