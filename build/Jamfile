@@ -2,12 +2,16 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
+require-b2 5.1 ;
+
 import package ;
 import path ;
 import sequence ;
 import set ;
-import ../../../tools/boost_install/boost-install ;
-import ../../../tools/boost_install/boost-install-dirs ;
+
+import-search /boost/boost_install ;
+import boost-install ;
+import boost-install-dirs ;
 
 # install-header-subdir
 
